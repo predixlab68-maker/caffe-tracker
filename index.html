@@ -3,70 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caffè Tracker Pro</title>
+  <title>Caffè Tracker Pro - Enterprise Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #090d16;
-      color: #f1f5f9;
+      background-color: #030712;
+      color: #f9fafb;
     }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-    }
-    .glass-pill {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     }
     .amber-glow {
-      box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.3);
     }
     .btn-gradient {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
     }
     .btn-gradient:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 25px -5px rgba(245, 158, 11, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
     }
     .btn-gradient:active {
       transform: translateY(1px);
     }
-    .custom-scrollbar::-webkit-scrollbar {
+    .custom-scroll::-webkit-scrollbar {
       width: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
+    .custom-scroll::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
+    .custom-scroll::-webkit-scrollbar-thumb {
       background: rgba(245, 158, 11, 0.3);
       border-radius: 4px;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-3 sm:p-6 pb-12 selection:bg-amber-500 selection:text-slate-950">
+<body class="min-h-screen flex flex-col items-center justify-start p-3 sm:p-6 pb-16 selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- Header Branding -->
+  <!-- TOP HEADER -->
   <header class="w-full max-w-lg flex items-center justify-between py-4 px-2 mb-2">
     <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-amber-500/20">
         <i class="fa-solid fa-mug-hot"></i>
       </div>
       <div>
-        <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-          BARISTA <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold uppercase tracking-widest">SaaS Edition</span>
-        </h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-extrabold tracking-tight text-white">COFFEE SQUAD</h1>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-extrabold uppercase tracking-widest">PRO v2.0</span>
+        </div>
         <p class="text-xs text-slate-400 font-medium">Gestione Turni Lun-Ven • Squad Tracker</p>
       </div>
     </div>
-    <button onclick="resetData()" title="Reset Dati" class="w-9 h-9 rounded-xl glass-pill flex items-center justify-center text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition">
+    <button onclick="resetData()" title="Reset Dati" class="w-10 h-10 rounded-2xl glass-panel flex items-center justify-center text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition">
       <i class="fa-solid fa-rotate-right text-sm"></i>
     </button>
   </header>
@@ -74,13 +70,13 @@
   <main class="w-full max-w-lg space-y-5">
 
     <!-- HERO CARD: TURNO ODIERNO -->
-    <div class="glass-card rounded-3xl p-6 text-center relative overflow-hidden amber-glow">
+    <div class="glass-panel rounded-3xl p-6 text-center relative overflow-hidden amber-glow">
       <div class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
         <span id="current-date-str" class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-amber-400"></i> --/--/----</span>
-        <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Lavoro Attivo</span>
+        <span id="status-badge" class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Lavoro Attivo</span>
       </div>
 
       <div class="py-4">
@@ -88,81 +84,91 @@
         <div id="hero-payer" class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 tracking-tight my-1 py-1">
           --
         </div>
-        <p id="hero-subtitle" class="text-xs text-slate-400 mt-1">Nessun costo per gli altri due compagni!</p>
+        <p id="hero-subtitle" class="text-xs text-slate-400 mt-1">Premi il pulsante per registrare e sincronizzare!</p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-2">
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-2">
         <button onclick="confirmAndShare()" class="sm:col-span-3 btn-gradient text-slate-950 font-black py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center space-x-2 text-sm tracking-wide">
-          <i class="fa-solid fa-check-double text-base"></i>
+          <i class="fa-solid fa-circle-check text-lg"></i>
           <span>PAGATO & CONDIVIDI WA</span>
         </button>
-        <button onclick="skipTurn()" class="sm:col-span-2 glass-pill text-slate-300 hover:text-white font-bold py-3.5 px-3 rounded-2xl border border-slate-700/60 hover:bg-slate-800 transition flex items-center justify-center space-x-1.5 text-xs">
+        <button onclick="skipTurn()" class="sm:col-span-2 glass-panel text-slate-300 hover:text-white font-bold py-3.5 px-3 rounded-2xl border border-slate-700/60 hover:bg-slate-800 transition flex items-center justify-center space-x-1.5 text-xs">
           <i class="fa-solid fa-forward text-amber-400"></i>
-          <span>Salta Oggi</span>
+          <span>Salta Turno</span>
         </button>
       </div>
     </div>
 
-    <!-- STATISTICHE & BALANCE COUNTER -->
-    <div class="glass-card rounded-3xl p-5 space-y-3">
+    <!-- BILANCIO & CREDITO/DEBITO -->
+    <div class="glass-panel rounded-3xl p-5 space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-amber-400"></i> Bilancio Caffè Pagati
+          <i class="fa-solid fa-scale-balanced text-amber-400"></i> Saldi & Performance
         </h2>
         <span id="total-coffees-badge" class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">0 Totali</span>
       </div>
 
       <div class="grid grid-cols-3 gap-3">
         <!-- Card Tu -->
-        <div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 text-center relative overflow-hidden group">
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
           <div class="text-2xl mb-1">👤</div>
           <p class="text-xs font-bold text-slate-300">Tu</p>
           <p id="cnt-Tu" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <div id="bar-Tu" class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 33%"></div>
-          </div>
+          <p id="bal-Tu" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
         </div>
 
         <!-- Card Luca -->
-        <div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 text-center relative overflow-hidden group">
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
           <div class="text-2xl mb-1">🧔‍♂️</div>
           <p class="text-xs font-bold text-slate-300">Luca</p>
           <p id="cnt-Luca" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <div id="bar-Luca" class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 33%"></div>
-          </div>
+          <p id="bal-Luca" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
         </div>
 
         <!-- Card Fede -->
-        <div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 text-center relative overflow-hidden group">
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
           <div class="text-2xl mb-1">🧑‍🦱</div>
           <p class="text-xs font-bold text-slate-300">Fede</p>
           <p id="cnt-Fede" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <div id="bar-Fede" class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 33%"></div>
-          </div>
+          <p id="bal-Fede" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
         </div>
       </div>
     </div>
 
-    <!-- PROGRAMMAZIONE PROSSIMI GIORNI -->
-    <div class="glass-card rounded-3xl p-5 space-y-3">
+    <!-- PROGRAMMAZIONE PROSSIMI 7 GIORNI -->
+    <div class="glass-panel rounded-3xl p-5 space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-calendar-days text-amber-400"></i> Prossimi Turni Lavorativi
+          <i class="fa-solid fa-calendar-week text-amber-400"></i> Calendario Turni (Lun - Ven)
         </h2>
         <span class="text-[10px] text-slate-500 font-semibold uppercase">Sab & Dom Esclusi</span>
       </div>
 
-      <div id="schedule-container" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-1">
+      <div id="schedule-container" class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
         <!-- Rendered via JS -->
       </div>
     </div>
 
-    <!-- FOOTER LINK WA PERMANENTE -->
+    <!-- TIMELINE STORICO & UNDO -->
+    <div class="glass-panel rounded-3xl p-5 space-y-3">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Ultimi Pagamenti
+        </h2>
+        <button onclick="undoLastAction()" title="Annulla Ultimo" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 transition">
+          <i class="fa-solid fa-rotate-left"></i> Annulla Ultimo
+        </button>
+      </div>
+
+      <div id="history-container" class="space-y-2 text-xs">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- FOOTER CONDIVISIONE LINK -->
     <div class="text-center pt-2">
-      <button onclick="copyPermanentLink()" class="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-amber-400 transition bg-slate-900/80 py-2 px-4 rounded-xl border border-slate-800">
+      <button onclick="copyBaseLink()" class="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-amber-400 transition bg-slate-900/90 py-2.5 px-4 rounded-xl border border-slate-800">
         <i class="fa-regular fa-copy"></i>
         <span>Copia Link Fisso per Gruppo WhatsApp</span>
       </button>
@@ -173,12 +179,13 @@
   <script>
     const members = ["Tu", "Luca", "Fede"];
     const avatars = { "Tu": "👤", "Luca": "🧔‍♂️", "Fede": "🧑‍🦱" };
-    
-    // Stato iniziale ancorato al 14 Ottobre 2026 (Mercoledì) -> Pagato da Tu
+
     let appState = {
-      payerIndex: 1, // Prossimo: Luca (Giovedì 15)
+      payerIndex: 1, // Prossimo: Luca (Giovedì 15 Ottobre 2026)
       counts: { "Tu": 1, "Luca": 0, "Fede": 0 },
-      lastUpdate: new Date().toISOString()
+      history: [
+        { payer: "Tu", timestamp: "Mercoledì 14 Ottobre 2026 - 08:30" }
+      ]
     };
 
     function isWeekend(date) {
@@ -199,21 +206,19 @@
     }
 
     function init() {
-      // 1. Prova a caricare lo stato dall URL Hash (quando aperto da WhatsApp)
       const hash = window.location.hash.substring(1);
       if (hash) {
         try {
           const decoded = JSON.parse(decodeURIComponent(atob(hash)));
           if (decoded && typeof decoded.payerIndex === 'number' && decoded.counts) {
             appState = decoded;
-            localStorage.setItem('caffe_app_saas_v1', JSON.stringify(appState));
+            localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
           }
         } catch (e) {
-          console.error("Errore parsing hash URL", e);
+          console.error("Hash decode error", e);
         }
       } else {
-        // 2. Altrimenti carica da localStorage
-        const local = localStorage.getItem('caffe_app_saas_v1');
+        const local = localStorage.getItem('caffe_tracker_v2');
         if (local) {
           try {
             appState = JSON.parse(local);
@@ -224,16 +229,22 @@
     }
 
     function renderUI() {
-      // Data di oggi formattata
       const today = new Date();
       const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
       document.getElementById('current-date-str').innerText = today.toLocaleDateString('it-IT', options);
 
-      // Chi paga oggi
+      const statusBadge = document.getElementById('status-badge');
+      if (isWeekend(today)) {
+        statusBadge.innerText = "Weekend - Pausa";
+        statusBadge.className = "px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold";
+      } else {
+        statusBadge.innerText = "Lavoro Attivo";
+        statusBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold";
+      }
+
       const currentPayer = members[appState.payerIndex];
       document.getElementById('hero-payer').innerText = `${avatars[currentPayer]} ${currentPayer}`;
 
-      // Statistiche
       let total = 0;
       members.forEach(m => {
         const cnt = appState.counts[m] || 0;
@@ -243,15 +254,23 @@
 
       document.getElementById('total-coffees-badge').innerText = `${total} Totali`;
 
-      // Barre di percentuale
+      const avg = total / 3;
       members.forEach(m => {
         const cnt = appState.counts[m] || 0;
-        const pct = total > 0 ? Math.round((cnt / total) * 100) : 33;
-        const bar = document.querySelector(`#bar-${m} div`);
-        if (bar) bar.style.width = `${pct}%`;
+        const diff = cnt - avg;
+        const balEl = document.getElementById(`bal-${m}`);
+        if (Math.abs(diff) < 0.1) {
+          balEl.innerText = "In pari";
+          balEl.className = "text-[10px] font-extrabold mt-1 text-slate-400";
+        } else if (diff > 0) {
+          balEl.innerText = `+${diff.toFixed(1)} Creditore`;
+          balEl.className = "text-[10px] font-extrabold mt-1 text-emerald-400";
+        } else {
+          balEl.innerText = `${diff.toFixed(1)} Debitore`;
+          balEl.className = "text-[10px] font-extrabold mt-1 text-rose-400";
+        }
       });
 
-      // Render Tabella Prossimi Turni
       const scheduleContainer = document.getElementById('schedule-container');
       scheduleContainer.innerHTML = '';
 
@@ -262,7 +281,7 @@
 
       let idx = appState.payerIndex;
 
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 7; i++) {
         const isTodayRow = (i === 0);
         const dayDate = isTodayRow ? dateIter : getNextWorkday(new Date(), i);
         const dayFormatted = dayDate.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -277,7 +296,7 @@
 
         row.innerHTML = `
           <div class="flex items-center space-x-3">
-            <span class="text-xs px-2 py-0.5 rounded-lg ${isTodayRow ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400 font-medium'} uppercase">
+            <span class="text-xs px-2.5 py-1 rounded-lg ${isTodayRow ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400 font-medium'} uppercase">
               ${isTodayRow ? 'Oggi' : dayFormatted}
             </span>
           </div>
@@ -289,26 +308,52 @@
         scheduleContainer.appendChild(row);
         idx = (idx + 1) % members.length;
       }
+
+      const historyContainer = document.getElementById('history-container');
+      historyContainer.innerHTML = '';
+
+      if (!appState.history || appState.history.length === 0) {
+        historyContainer.innerHTML = '<p class="text-slate-500 text-center py-2">Nessun pagamento registrato.</p>';
+      } else {
+        const recent = appState.history.slice(-5).reverse();
+        recent.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/60 text-slate-300';
+          div.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 font-bold">${avatars[item.payer] || '☕'} ${item.payer}</span>
+              <span class="text-slate-500">ha pagato</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">${item.timestamp}</span>
+          `;
+          historyContainer.appendChild(div);
+        });
+      }
     }
 
     function confirmAndShare() {
       const currentPayer = members[appState.payerIndex];
       appState.counts[currentPayer] = (appState.counts[currentPayer] || 0) + 1;
-      appState.payerIndex = (appState.payerIndex + 1) % members.length;
-      appState.lastUpdate = new Date().toISOString();
 
-      localStorage.setItem('caffe_app_saas_v1', JSON.stringify(appState));
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) + ' ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+
+      if (!appState.history) appState.history = [];
+      appState.history.push({ payer: currentPayer, timestamp: timeStr });
+
+      appState.payerIndex = (appState.payerIndex + 1) % members.length;
+
+      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
       renderUI();
 
-      // Generazione Hash e Link WA
       const encoded = btoa(encodeURIComponent(JSON.stringify(appState)));
       const baseUrl = window.location.href.split('#')[0];
       const shareUrl = `${baseUrl}#${encoded}`;
       const nextPayer = members[appState.payerIndex];
 
       const msg = encodeURIComponent(
-        `☕ *Barista SaaS - Registro Caffè*\n` +
-        `✅ *${currentPayer}* ha appena pagato il caffè!\n` +
+        `☕ *Barista Squad Pro - Registro Caffè*\n` +
+        `✅ *${currentPayer}* ha pagato il caffè!\n` +
         `👉 Prossimo turno: *${nextPayer}*\n\n` +
         `Aggiorna la tua Dashboard:\n${shareUrl}`
       );
@@ -318,27 +363,40 @@
 
     function skipTurn() {
       appState.payerIndex = (appState.payerIndex + 1) % members.length;
-      localStorage.setItem('caffe_app_saas_v1', JSON.stringify(appState));
+      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
+      renderUI();
+    }
+
+    function undoLastAction() {
+      if (!appState.history || appState.history.length === 0) return;
+      const last = appState.history.pop();
+      if (last && last.payer) {
+        if (appState.counts[last.payer] > 0) {
+          appState.counts[last.payer]--;
+        }
+        appState.payerIndex = (appState.payerIndex - 1 + members.length) % members.length;
+      }
+      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
       renderUI();
     }
 
     function resetData() {
-      if (confirm("Vuoi azzerare lo storico dei caffè e ripartire da zero?")) {
+      if (confirm("Vuoi azzerare completamente lo storico dei caffè?")) {
         appState = {
           payerIndex: 0,
           counts: { "Tu": 0, "Luca": 0, "Fede": 0 },
-          lastUpdate: new Date().toISOString()
+          history: []
         };
-        localStorage.setItem('caffe_app_saas_v1', JSON.stringify(appState));
+        localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
         window.location.hash = '';
         renderUI();
       }
     }
 
-    function copyPermanentLink() {
+    function copyBaseLink() {
       const baseUrl = window.location.href.split('#')[0];
       navigator.clipboard.writeText(baseUrl).then(() => {
-        alert("Link di base copiato negli appunti!");
+        alert("Link base copiato!");
       });
     }
 
