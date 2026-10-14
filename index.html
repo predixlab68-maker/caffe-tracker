@@ -3,190 +3,338 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caffè Tracker Pro - Enterprise Edition</title>
+  <meta name="theme-color" content="#0d0907">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Caffè Tracker Pro - Dark Roast Edition</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #030712;
-      color: #f9fafb;
+      background-color: #0d0907;
+      color: #f8fafc;
     }
+    
     .glass-panel {
-      background: rgba(17, 24, 39, 0.7);
+      background: rgba(22, 16, 13, 0.82);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
     }
-    .amber-glow {
-      box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.3);
+    
+    .espresso-glow {
+      box-shadow: 0 0 40px -5px rgba(245, 158, 11, 0.25);
     }
+    
     .btn-gradient {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      transition: all 0.2s ease;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .btn-gradient:hover {
-      transform: translateY(-2px);
       box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
     }
     .btn-gradient:active {
-      transform: translateY(1px);
+      transform: scale(0.96);
     }
-    .custom-scroll::-webkit-scrollbar {
-      width: 4px;
+
+    /* Steam Animation */
+    .steam-container {
+      position: relative;
+      display: inline-block;
     }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+    .steam-line {
+      position: absolute;
+      top: -12px;
+      width: 3px;
+      height: 12px;
+      background: rgba(251, 191, 36, 0.6);
+      border-radius: 50%;
+      animation: steam 2s infinite ease-out;
     }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(245, 158, 11, 0.3);
-      border-radius: 4px;
+    .steam-1 { left: 30%; animation-delay: 0s; }
+    .steam-2 { left: 50%; animation-delay: 0.4s; }
+    .steam-3 { left: 70%; animation-delay: 0.8s; }
+
+    @keyframes steam {
+      0% { transform: translateY(0) scaleX(1); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-16px) scaleX(2); opacity: 0; }
     }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(13, 9, 7, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.3); border-radius: 4px; }
+
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; opacity: 0; visibility: hidden;
+      transition: all 0.3s ease; padding: 1rem;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-content {
+      background: rgba(22, 16, 13, 0.96);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 1.5rem; padding: 1.25rem;
+      max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto;
+      transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(22, 16, 13, 0.95);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 1rem; padding: 0.875rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      z-index: 60; opacity: 0; transition: all 0.3s ease;
+      max-width: calc(100% - 2rem); width: auto;
+    }
+    .toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-success { border-color: rgba(16, 185, 129, 0.4); }
+    .toast-warning { border-color: rgba(245, 158, 11, 0.4); }
+    .toast-error { border-color: rgba(239, 68, 68, 0.4); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-3 sm:p-6 pb-16 selection:bg-amber-500 selection:text-slate-950">
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-4 pb-12 selection:bg-amber-500 selection:text-slate-950 overflow-x-hidden">
 
-  <!-- TOP HEADER -->
-  <header class="w-full max-w-lg flex items-center justify-between py-4 px-2 mb-2">
+  <!-- BRANDING HEADER -->
+  <header class="w-full max-w-md flex items-center justify-between py-3 px-2 mb-2">
     <div class="flex items-center space-x-3">
-      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-amber-500/20">
-        <i class="fa-solid fa-mug-hot"></i>
+      <div class="steam-container">
+        <div class="steam-line steam-1"></div>
+        <div class="steam-line steam-2"></div>
+        <div class="steam-line steam-3"></div>
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-mug-hot"></i>
+        </div>
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-xl font-extrabold tracking-tight text-white">COFFEE SQUAD</h1>
-          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-extrabold uppercase tracking-widest">PRO v2.0</span>
+        <div class="flex items-center gap-1.5">
+          <h1 class="text-lg font-black tracking-tight text-white">COFFEE SQUAD</h1>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-extrabold uppercase tracking-widest">DARK ROAST</span>
         </div>
-        <p class="text-xs text-slate-400 font-medium">Gestione Turni Lun-Ven • Squad Tracker</p>
+        <p class="text-[10px] text-amber-200/60 font-medium">Gestione Turni Lun-Ven • Squad Tracker</p>
       </div>
     </div>
-    <button onclick="resetData()" title="Reset Dati" class="w-10 h-10 rounded-2xl glass-panel flex items-center justify-center text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition">
-      <i class="fa-solid fa-rotate-right text-sm"></i>
-    </button>
+    <div class="flex items-center gap-2">
+      <button onclick="openSettings()" title="Impostazioni" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-amber-200/70 hover:text-amber-400 hover:border-amber-500/40 transition active:scale-95" aria-label="Impostazioni">
+        <i class="fa-solid fa-gear text-sm"></i>
+      </button>
+      <button onclick="resetData()" title="Reset Dati" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-amber-200/70 hover:text-rose-400 hover:border-rose-500/40 transition active:scale-95" aria-label="Reset dati">
+        <i class="fa-solid fa-rotate-right text-sm"></i>
+      </button>
+    </div>
   </header>
 
-  <main class="w-full max-w-lg space-y-5">
+  <main class="w-full max-w-md space-y-4">
 
     <!-- HERO CARD: TURNO ODIERNO -->
-    <div class="glass-panel rounded-3xl p-6 text-center relative overflow-hidden amber-glow">
-      <div class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="glass-panel rounded-3xl p-5 text-center relative overflow-hidden espresso-glow">
+      <div class="absolute -top-20 -right-20 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-amber-700/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+      <div class="flex justify-between items-center text-[10px] font-semibold uppercase tracking-wider text-amber-200/60 mb-1">
         <span id="current-date-str" class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-amber-400"></i> --/--/----</span>
-        <span id="status-badge" class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Lavoro Attivo</span>
+        <span id="workday-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-extrabold">Lavoro Attivo</span>
       </div>
 
-      <div class="py-4">
-        <p class="text-xs uppercase tracking-widest font-bold text-slate-400 mb-1">Oggi il caffè lo offre</p>
-        <div id="hero-payer" class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 tracking-tight my-1 py-1">
+      <div class="py-3">
+        <p class="text-[10px] uppercase tracking-widest font-extrabold text-amber-400/80 mb-1">Oggi il caffè lo offre</p>
+        <div id="hero-payer" class="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-amber-500 tracking-tight my-1 py-1">
           --
         </div>
-        <p id="hero-subtitle" class="text-xs text-slate-400 mt-1">Premi il pulsante per registrare e sincronizzare!</p>
+        <p id="hero-subtitle" class="text-[11px] text-slate-400 mt-0.5">Tocca per registrare e sincronizzare!</p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-2">
-        <button onclick="confirmAndShare()" class="sm:col-span-3 btn-gradient text-slate-950 font-black py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center space-x-2 text-sm tracking-wide">
-          <i class="fa-solid fa-circle-check text-lg"></i>
+      <div class="grid grid-cols-1 gap-2 pt-1">
+        <button onclick="confirmAndShare()" class="min-h-[50px] btn-gradient text-slate-950 font-black py-3.5 px-4 rounded-2xl shadow-xl flex items-center justify-center space-x-2 text-sm tracking-wide active:scale-95 transition-transform">
+          <i class="fa-solid fa-mug-saucer text-lg"></i>
           <span>PAGATO & CONDIVIDI WA</span>
         </button>
-        <button onclick="skipTurn()" class="sm:col-span-2 glass-panel text-slate-300 hover:text-white font-bold py-3.5 px-3 rounded-2xl border border-slate-700/60 hover:bg-slate-800 transition flex items-center justify-center space-x-1.5 text-xs">
+        <button onclick="skipTurn()" class="min-h-[46px] glass-panel text-slate-300 hover:text-white font-bold py-2.5 px-3 rounded-2xl border border-amber-900/40 hover:bg-amber-950/40 transition flex items-center justify-center space-x-2 text-xs active:scale-95">
           <i class="fa-solid fa-forward text-amber-400"></i>
-          <span>Salta Turno</span>
+          <span>Salta Turno Oggi</span>
         </button>
       </div>
     </div>
 
     <!-- BILANCIO & CREDITO/DEBITO -->
-    <div class="glass-panel rounded-3xl p-5 space-y-3">
+    <div class="glass-panel rounded-3xl p-4 space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-scale-balanced text-amber-400"></i> Saldi & Performance
+        <h2 class="text-[10px] font-extrabold text-amber-200/60 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-scale-balanced text-amber-400"></i> Bilancio & Saldi
         </h2>
-        <span id="total-coffees-badge" class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">0 Totali</span>
+        <span id="total-coffees-badge" class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">0 Totali</span>
       </div>
 
-      <div class="grid grid-cols-3 gap-3">
-        <!-- Card Tu -->
-        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
-          <div class="text-2xl mb-1">👤</div>
-          <p class="text-xs font-bold text-slate-300">Tu</p>
-          <p id="cnt-Tu" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <p id="bal-Tu" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
-        </div>
-
-        <!-- Card Luca -->
-        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
-          <div class="text-2xl mb-1">🧔‍♂️</div>
-          <p class="text-xs font-bold text-slate-300">Luca</p>
-          <p id="cnt-Luca" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <p id="bal-Luca" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
-        </div>
-
-        <!-- Card Fede -->
-        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800/80 text-center relative overflow-hidden">
-          <div class="text-2xl mb-1">🧑‍🦱</div>
-          <p class="text-xs font-bold text-slate-300">Fede</p>
-          <p id="cnt-Fede" class="text-2xl font-black text-amber-400 mt-0.5">0</p>
-          <p id="bal-Fede" class="text-[10px] font-extrabold mt-1 text-slate-400">0 in pari</p>
-        </div>
+      <div id="stats-container" class="grid grid-cols-3 gap-2">
+        <!-- Generated via JS -->
       </div>
     </div>
 
-    <!-- PROGRAMMAZIONE PROSSIMI 7 GIORNI -->
-    <div class="glass-panel rounded-3xl p-5 space-y-3">
+    <!-- CALENDARIO PROSSIMI TURNI -->
+    <div class="glass-panel rounded-3xl p-4 space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-          <i class="fa-solid fa-calendar-week text-amber-400"></i> Calendario Turni (Lun - Ven)
+        <h2 class="text-[10px] font-extrabold text-amber-200/60 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-calendar-days text-amber-400"></i> Calendario Turni (Lun - Ven)
         </h2>
-        <span class="text-[10px] text-slate-500 font-semibold uppercase">Sab & Dom Esclusi</span>
+        <span class="text-[9px] text-slate-500 font-semibold uppercase">Sab & Dom Esclusi</span>
       </div>
 
-      <div id="schedule-container" class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1">
-        <!-- Rendered via JS -->
+      <div id="schedule-container" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+        <!-- Generated via JS -->
       </div>
     </div>
 
-    <!-- TIMELINE STORICO & UNDO -->
-    <div class="glass-panel rounded-3xl p-5 space-y-3">
+    <!-- STORICO CRONOLOGICO & UNDO -->
+    <div class="glass-panel rounded-3xl p-4 space-y-3">
       <div class="flex justify-between items-center">
-        <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+        <h2 class="text-[10px] font-extrabold text-amber-200/60 uppercase tracking-wider flex items-center gap-2">
           <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Ultimi Pagamenti
         </h2>
-        <button onclick="undoLastAction()" title="Annulla Ultimo" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 transition">
+        <button onclick="undoLastAction()" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 transition">
           <i class="fa-solid fa-rotate-left"></i> Annulla Ultimo
         </button>
       </div>
 
       <div id="history-container" class="space-y-2 text-xs">
-        <!-- Rendered via JS -->
+        <!-- Generated via JS -->
       </div>
     </div>
 
-    <!-- FOOTER CONDIVISIONE LINK -->
-    <div class="text-center pt-2">
-      <button onclick="copyBaseLink()" class="inline-flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-amber-400 transition bg-slate-900/90 py-2.5 px-4 rounded-xl border border-slate-800">
-        <i class="fa-regular fa-copy"></i>
-        <span>Copia Link Fisso per Gruppo WhatsApp</span>
+    <!-- FOOTER PERMANENT LINK -->
+    <div class="text-center pt-1">
+      <button onclick="copyPermanentLink()" class="min-h-[44px] inline-flex items-center justify-center space-x-2 text-xs font-semibold text-slate-400 hover:text-amber-400 transition bg-amber-950/30 py-2.5 px-4 rounded-xl border border-amber-900/30 w-full active:scale-95">
+        <i class="fa-regular fa-copy text-xs"></i>
+        <span>Copia Link Fisso Gruppo WhatsApp</span>
       </button>
     </div>
 
   </main>
 
-  <script>
-    const members = ["Tu", "Luca", "Fede"];
-    const avatars = { "Tu": "👤", "Luca": "🧔‍♂️", "Fede": "🧑‍🦱" };
+  <!-- MODAL CUSTOM -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-3">
+        <h3 id="modal-title" class="text-base font-bold text-white"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white transition p-1" aria-label="Chiudi">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="modal-message" class="text-slate-300 text-xs mb-5"></div>
+      <div id="modal-actions" class="flex gap-2 justify-end"></div>
+    </div>
+  </div>
 
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast" role="alert" aria-live="polite">
+    <i id="toast-icon" class="fa-solid"></i>
+    <span id="toast-message" class="text-xs font-medium text-white"></span>
+  </div>
+
+  <script>
+    const DEFAULT_MEMBERS = [
+      { name: "Tu", avatar: "👤" },
+      { name: "Luca", avatar: "🧔‍♂️" },
+      { name: "Fede", avatar: "🧑‍🦱" }
+    ];
+
+    const STORAGE_KEY = 'caffe_app_saas_v3';
+    const MEMBERS_KEY = 'caffe_app_members_v3';
+
+    let members = [];
     let appState = {
-      payerIndex: 1, // Prossimo: Luca (Giovedì 15 Ottobre 2026)
-      counts: { "Tu": 1, "Luca": 0, "Fede": 0 },
-      history: [
-        { payer: "Tu", timestamp: "Mercoledì 14 Ottobre 2026 - 08:30" }
-      ]
+      payerIndex: 0,
+      counts: {},
+      history: [],
+      lastUpdate: new Date().toISOString()
     };
+
+    function isStorageAvailable() {
+      try {
+        const test = '__storage_test__';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function loadMembers() {
+      if (!isStorageAvailable()) {
+        members = [...DEFAULT_MEMBERS];
+        return;
+      }
+      const stored = localStorage.getItem(MEMBERS_KEY);
+      if (stored) {
+        try { members = JSON.parse(stored); } catch (e) { members = [...DEFAULT_MEMBERS]; }
+      } else {
+        members = [...DEFAULT_MEMBERS];
+        saveMembers();
+      }
+    }
+
+    function saveMembers() {
+      if (isStorageAvailable()) {
+        try { localStorage.setItem(MEMBERS_KEY, JSON.stringify(members)); } catch (e) {}
+      }
+    }
+
+    function loadState() {
+      if (!isStorageAvailable()) return;
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try { appState = JSON.parse(stored); } catch (e) {}
+      }
+    }
+
+    function saveState() {
+      if (isStorageAvailable()) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch (e) {}
+      }
+    }
+
+    function initializeCounts() {
+      members.forEach(m => {
+        if (appState.counts[m.name] === undefined) {
+          appState.counts[m.name] = 0;
+        }
+      });
+      if (!appState.history) appState.history = [];
+    }
+
+    function init() {
+      loadMembers();
+      loadState();
+      initializeCounts();
+
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        try {
+          const decodedStr = decodeURIComponent(hash);
+          const decoded = JSON.parse(decodedStr);
+          if (decoded && typeof decoded.payerIndex === 'number' && decoded.counts) {
+            appState = decoded;
+            initializeCounts();
+            if (isStorageAvailable()) saveState();
+            showToast('Stato sincronizzato dal link!', 'success');
+          }
+        } catch (e) {
+          console.error("Errore parsing hash URL", e);
+        }
+      }
+      renderUI();
+    }
 
     function isWeekend(date) {
       const day = date.getDay();
@@ -198,163 +346,258 @@
       let count = 0;
       while (count < offsetDays) {
         d.setDate(d.getDate() + 1);
-        if (!isWeekend(d)) {
-          count++;
-        }
+        if (!isWeekend(d)) count++;
       }
       return d;
     }
 
-    function init() {
-      const hash = window.location.hash.substring(1);
-      if (hash) {
-        try {
-          const decoded = JSON.parse(decodeURIComponent(atob(hash)));
-          if (decoded && typeof decoded.payerIndex === 'number' && decoded.counts) {
-            appState = decoded;
-            localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
-          }
-        } catch (e) {
-          console.error("Hash decode error", e);
-        }
-      } else {
-        const local = localStorage.getItem('caffe_tracker_v2');
-        if (local) {
-          try {
-            appState = JSON.parse(local);
-          } catch (e) {}
-        }
-      }
-      renderUI();
+    function renderUI() {
+      renderHeader();
+      renderHero();
+      renderStats();
+      renderSchedule();
+      renderHistory();
     }
 
-    function renderUI() {
+    function renderHeader() {
       const today = new Date();
       const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-      document.getElementById('current-date-str').innerText = today.toLocaleDateString('it-IT', options);
+      const dateStr = document.getElementById('current-date-str');
+      dateStr.innerHTML = `<i class="fa-regular fa-calendar text-amber-400"></i> ${today.toLocaleDateString('it-IT', options)}`;
+    }
 
-      const statusBadge = document.getElementById('status-badge');
+    function renderHero() {
+      const today = new Date();
+      const badge = document.getElementById('workday-badge');
       if (isWeekend(today)) {
-        statusBadge.innerText = "Weekend - Pausa";
-        statusBadge.className = "px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold";
+        if (badge) {
+          badge.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] font-extrabold';
+          badge.innerText = 'Weekend - Riposo';
+        }
       } else {
-        statusBadge.innerText = "Lavoro Attivo";
-        statusBadge.className = "px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold";
+        if (badge) {
+          badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-extrabold';
+          badge.innerText = 'Lavoro Attivo';
+        }
       }
 
       const currentPayer = members[appState.payerIndex];
-      document.getElementById('hero-payer').innerText = `${avatars[currentPayer]} ${currentPayer}`;
+      if (currentPayer) {
+        document.getElementById('hero-payer').innerText = `${currentPayer.avatar} ${currentPayer.name}`;
+      }
+    }
+
+    function renderStats() {
+      const container = document.getElementById('stats-container');
+      container.innerHTML = '';
 
       let total = 0;
       members.forEach(m => {
-        const cnt = appState.counts[m] || 0;
+        const cnt = appState.counts[m.name] || 0;
         total += cnt;
-        document.getElementById(`cnt-${m}`).innerText = cnt;
       });
 
       document.getElementById('total-coffees-badge').innerText = `${total} Totali`;
+      const avg = members.length > 0 ? total / members.length : 0;
 
-      const avg = total / 3;
       members.forEach(m => {
-        const cnt = appState.counts[m] || 0;
+        const cnt = appState.counts[m.name] || 0;
         const diff = cnt - avg;
-        const balEl = document.getElementById(`bal-${m}`);
-        if (Math.abs(diff) < 0.1) {
-          balEl.innerText = "In pari";
-          balEl.className = "text-[10px] font-extrabold mt-1 text-slate-400";
-        } else if (diff > 0) {
-          balEl.innerText = `+${diff.toFixed(1)} Creditore`;
-          balEl.className = "text-[10px] font-extrabold mt-1 text-emerald-400";
-        } else {
-          balEl.innerText = `${diff.toFixed(1)} Debitore`;
-          balEl.className = "text-[10px] font-extrabold mt-1 text-rose-400";
+        
+        let balText = 'In pari';
+        let balClass = 'text-slate-400';
+        if (diff > 0.1) {
+          balText = `+${diff.toFixed(1)} Credito`;
+          balClass = 'text-emerald-400';
+        } else if (diff < -0.1) {
+          balText = `${diff.toFixed(1)} Debito`;
+          balClass = 'text-rose-400';
         }
-      });
 
+        const card = document.createElement('div');
+        card.className = 'bg-amber-950/20 p-3 min-h-[125px] rounded-2xl border border-amber-900/30 text-center flex flex-col justify-between';
+        card.innerHTML = `
+          <div>
+            <div class="text-xl mb-0.5">${m.avatar}</div>
+            <p class="text-[10px] font-bold text-slate-300 truncate">${m.name}</p>
+          </div>
+          <div>
+            <p class="text-2xl font-black text-amber-400">${cnt}</p>
+            <p class="text-[9px] font-extrabold ${balClass} mt-0.5">${balText}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderSchedule() {
       const scheduleContainer = document.getElementById('schedule-container');
       scheduleContainer.innerHTML = '';
 
-      let dateIter = new Date();
-      if (isWeekend(dateIter)) {
-        dateIter = getNextWorkday(dateIter, 1);
+      const today = new Date();
+      let workdayCount = 0;
+      let dateIter = new Date(today);
+
+      while (isWeekend(dateIter)) {
+        dateIter.setDate(dateIter.getDate() + 1);
       }
 
       let idx = appState.payerIndex;
 
-      for (let i = 0; i < 7; i++) {
-        const isTodayRow = (i === 0);
-        const dayDate = isTodayRow ? dateIter : getNextWorkday(new Date(), i);
-        const dayFormatted = dayDate.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+      while (workdayCount < 7) {
+        if (isWeekend(dateIter)) {
+          dateIter.setDate(dateIter.getDate() + 1);
+          continue;
+        }
+
+        const isTodayRow = (workdayCount === 0);
+        const dayFormatted = dateIter.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
         const person = members[idx];
 
+        if (!person) break;
+
         const row = document.createElement('div');
-        row.className = `flex justify-between items-center p-3 rounded-2xl border transition ${
-          isTodayRow 
-            ? 'bg-amber-500/10 border-amber-500/40 text-amber-300 font-bold' 
-            : 'bg-slate-900/40 border-slate-800/80 text-slate-300'
+        row.className = `flex justify-between items-center min-h-[46px] p-2.5 rounded-2xl border transition ${
+          isTodayRow
+            ? 'bg-amber-500/10 border-amber-500/40 text-amber-300 font-bold'
+            : 'bg-amber-950/10 border-amber-900/20 text-slate-300'
         }`;
 
         row.innerHTML = `
-          <div class="flex items-center space-x-3">
-            <span class="text-xs px-2.5 py-1 rounded-lg ${isTodayRow ? 'bg-amber-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400 font-medium'} uppercase">
+          <div class="flex items-center space-x-2">
+            <span class="text-[10px] px-2 py-0.5 rounded-lg ${isTodayRow ? 'bg-amber-500 text-slate-950 font-black' : 'bg-amber-950/50 text-slate-400 font-medium'} uppercase whitespace-nowrap">
               ${isTodayRow ? 'Oggi' : dayFormatted}
             </span>
           </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-sm font-extrabold">${avatars[person]} ${person}</span>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-xs font-extrabold">${person.avatar} ${person.name}</span>
           </div>
         `;
 
         scheduleContainer.appendChild(row);
         idx = (idx + 1) % members.length;
+        workdayCount++;
+        dateIter.setDate(dateIter.getDate() + 1);
       }
+    }
 
-      const historyContainer = document.getElementById('history-container');
-      historyContainer.innerHTML = '';
+    function renderHistory() {
+      const container = document.getElementById('history-container');
+      container.innerHTML = '';
 
       if (!appState.history || appState.history.length === 0) {
-        historyContainer.innerHTML = '<p class="text-slate-500 text-center py-2">Nessun pagamento registrato.</p>';
-      } else {
-        const recent = appState.history.slice(-5).reverse();
-        recent.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'flex justify-between items-center bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/60 text-slate-300';
-          div.innerHTML = `
-            <div class="flex items-center gap-2">
-              <span class="text-amber-400 font-bold">${avatars[item.payer] || '☕'} ${item.payer}</span>
-              <span class="text-slate-500">ha pagato</span>
-            </div>
-            <span class="text-[10px] text-slate-400 font-mono">${item.timestamp}</span>
-          `;
-          historyContainer.appendChild(div);
-        });
+        container.innerHTML = '<p class="text-slate-500 text-center py-2 text-[11px]">Nessuna transazione registrata.</p>';
+        return;
       }
+
+      const recent = appState.history.slice(-4).reverse();
+      recent.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center bg-amber-950/20 p-2.5 rounded-xl border border-amber-900/30 text-slate-300';
+        div.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <span class="text-amber-400 font-bold">${item.avatar || '☕'} ${item.payer}</span>
+            <span class="text-slate-500 text-[10px]">ha pagato</span>
+          </div>
+          <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function showModal(title, message, actions) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-message').innerHTML = message;
+
+      const actionsContainer = document.getElementById('modal-actions');
+      actionsContainer.innerHTML = '';
+
+      actions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.className = action.primary
+          ? 'btn-gradient text-slate-950 font-bold py-2 px-4 rounded-xl text-xs min-h-[44px] active:scale-95'
+          : 'glass-panel text-slate-300 hover:text-white font-bold py-2 px-4 rounded-xl text-xs min-h-[44px] active:scale-95';
+        btn.innerText = action.label;
+        btn.onclick = () => {
+          action.callback();
+          closeModal();
+        };
+        actionsContainer.appendChild(btn);
+      });
+
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-message');
+
+      msg.innerText = message;
+      toast.className = `toast toast-${type}`;
+
+      if (type === 'success') icon.className = 'fa-solid fa-check-circle text-emerald-400';
+      else if (type === 'warning') icon.className = 'fa-solid fa-exclamation-triangle text-amber-400';
+      else icon.className = 'fa-solid fa-circle-xmark text-red-400';
+
+      toast.classList.add('active');
+      setTimeout(() => { toast.classList.remove('active'); }, 3000);
     }
 
     function confirmAndShare() {
       const currentPayer = members[appState.payerIndex];
-      appState.counts[currentPayer] = (appState.counts[currentPayer] || 0) + 1;
+      if (!currentPayer) return;
+
+      showModal(
+        'Conferma Pagamento',
+        `${currentPayer.name} sta per pagare il caffè per tutti. Confermi?`,
+        [
+          { label: 'Annulla', primary: false, callback: () => {} },
+          { label: 'Conferma & Condividi', primary: true, callback: () => executeShare() }
+        ]
+      );
+    }
+
+    function executeShare() {
+      const currentPayer = members[appState.payerIndex];
+      if (!currentPayer) return;
+
+      appState.counts[currentPayer.name] = (appState.counts[currentPayer.name] || 0) + 1;
 
       const now = new Date();
       const timeStr = now.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) + ' ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-
+      
       if (!appState.history) appState.history = [];
-      appState.history.push({ payer: currentPayer, timestamp: timeStr });
+      appState.history.push({ payer: currentPayer.name, avatar: currentPayer.avatar, timestamp: timeStr });
 
       appState.payerIndex = (appState.payerIndex + 1) % members.length;
+      appState.lastUpdate = new Date().toISOString();
 
-      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
+      saveState();
       renderUI();
+      showToast(`${currentPayer.name} ha pagato!`, 'success');
 
-      const encoded = btoa(encodeURIComponent(JSON.stringify(appState)));
+      if (window.confetti) {
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+      }
+
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 50, 50]);
+      }
+
+      const encoded = encodeURIComponent(JSON.stringify(appState));
       const baseUrl = window.location.href.split('#')[0];
       const shareUrl = `${baseUrl}#${encoded}`;
       const nextPayer = members[appState.payerIndex];
 
       const msg = encodeURIComponent(
-        `☕ *Barista Squad Pro - Registro Caffè*\n` +
-        `✅ *${currentPayer}* ha pagato il caffè!\n` +
-        `👉 Prossimo turno: *${nextPayer}*\n\n` +
+        `☕ *Barista Squad - Registro Caffè*\n` +
+        `✅ *${currentPayer.name}* ha appena offerto il caffè!\n` +
+        `👉 Prossimo turno: *${nextPayer.name}*\n\n` +
         `Aggiorna la tua Dashboard:\n${shareUrl}`
       );
 
@@ -362,13 +605,31 @@
     }
 
     function skipTurn() {
-      appState.payerIndex = (appState.payerIndex + 1) % members.length;
-      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
-      renderUI();
+      const currentPayer = members[appState.payerIndex];
+      showModal(
+        'Salta Turno',
+        `Vuoi saltare il turno di ${currentPayer.name}?`,
+        [
+          { label: 'Annulla', primary: false, callback: () => {} },
+          {
+            label: 'Salta',
+            primary: true,
+            callback: () => {
+              appState.payerIndex = (appState.payerIndex + 1) % members.length;
+              saveState();
+              renderUI();
+              showToast('Turno saltato', 'warning');
+            }
+          }
+        ]
+      );
     }
 
     function undoLastAction() {
-      if (!appState.history || appState.history.length === 0) return;
+      if (!appState.history || appState.history.length === 0) {
+        showToast('Nessuna azione da annullare', 'warning');
+        return;
+      }
       const last = appState.history.pop();
       if (last && last.payer) {
         if (appState.counts[last.payer] > 0) {
@@ -376,31 +637,118 @@
         }
         appState.payerIndex = (appState.payerIndex - 1 + members.length) % members.length;
       }
-      localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
+      saveState();
       renderUI();
+      showToast('Ultimo pagamento annullato', 'success');
     }
 
     function resetData() {
-      if (confirm("Vuoi azzerare completamente lo storico dei caffè?")) {
-        appState = {
-          payerIndex: 0,
-          counts: { "Tu": 0, "Luca": 0, "Fede": 0 },
-          history: []
-        };
-        localStorage.setItem('caffe_tracker_v2', JSON.stringify(appState));
-        window.location.hash = '';
-        renderUI();
-      }
+      showModal(
+        'Reset Dati',
+        'Vuoi azzerare completamente lo storico dei caffè?',
+        [
+          { label: 'Annulla', primary: false, callback: () => {} },
+          {
+            label: 'Reset Completo',
+            primary: true,
+            callback: () => {
+              appState = { payerIndex: 0, counts: {}, history: [], lastUpdate: new Date().toISOString() };
+              initializeCounts();
+              if (isStorageAvailable()) saveState();
+              window.location.hash = '';
+              renderUI();
+              showToast('Dati azzerati', 'success');
+            }
+          }
+        ]
+      );
     }
 
-    function copyBaseLink() {
+    function copyPermanentLink() {
       const baseUrl = window.location.href.split('#')[0];
       navigator.clipboard.writeText(baseUrl).then(() => {
-        alert("Link base copiato!");
+        showToast('Link fisso copiato negli appunti!', 'success');
+      }).catch(() => {
+        showToast('Errore nella copia', 'error');
       });
     }
 
+    function openSettings() {
+      const settingsHTML = `
+        <div class="space-y-3">
+          <div>
+            <label class="block text-[10px] font-bold text-amber-200/60 uppercase tracking-wider mb-2">Membri del Gruppo</label>
+            <div id="members-list" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar">
+              ${members.map((m, i) => `
+                <div class="flex items-center gap-2 bg-amber-950/30 p-2 rounded-xl border border-amber-900/40">
+                  <input type="text" value="${m.name}" data-index="${i}" class="member-name flex-1 bg-transparent text-xs text-white font-medium focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-2 py-1" placeholder="Nome">
+                  <input type="text" value="${m.avatar}" data-index="${i}" class="member-avatar w-10 bg-transparent text-base text-center focus:outline-none focus:ring-1 focus:ring-amber-500 rounded px-1 py-1" placeholder="👤">
+                  <button onclick="removeMember(${i})" class="w-10 h-10 text-slate-400 hover:text-red-400 transition flex items-center justify-center rounded-lg hover:bg-red-500/10 active:scale-95" aria-label="Rimuovi">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <button onclick="addMember()" class="w-full h-10 glass-panel text-slate-300 hover:text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95">
+            <i class="fa-solid fa-plus text-amber-400"></i>
+            Aggiungi Membro
+          </button>
+        </div>
+      `;
+
+      document.getElementById('modal-title').innerText = 'Impostazioni';
+      document.getElementById('modal-message').innerHTML = settingsHTML;
+
+      const actionsContainer = document.getElementById('modal-actions');
+      actionsContainer.innerHTML = `
+        <button onclick="closeModal()" class="glass-panel text-slate-300 hover:text-white font-bold py-2 px-4 rounded-xl text-xs min-h-[40px] active:scale-95">Annulla</button>
+        <button onclick="saveSettings()" class="btn-gradient text-slate-950 font-bold py-2 px-4 rounded-xl text-xs min-h-[40px] active:scale-95">Salva</button>
+      `;
+
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function addMember() {
+      members.push({ name: 'Nuovo', avatar: '👤' });
+      openSettings();
+    }
+
+    function removeMember(index) {
+      if (members.length <= 2) {
+        showToast('Minimo 2 membri richiesti', 'error');
+        return;
+      }
+      members.splice(index, 1);
+      openSettings();
+    }
+
+    function saveSettings() {
+      const nameInputs = document.querySelectorAll('.member-name');
+      const avatarInputs = document.querySelectorAll('.member-avatar');
+
+      members = Array.from(nameInputs).map((input, i) => ({
+        name: input.value.trim() || `Membro ${i + 1}`,
+        avatar: avatarInputs[i].value.trim() || '👤'
+      }));
+
+      saveMembers();
+      initializeCounts();
+      saveState();
+      renderUI();
+      closeModal();
+      showToast('Impostazioni salvate', 'success');
+    }
+
     window.addEventListener('load', init);
+
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-overlay') closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
   </script>
 </body>
 </html>
