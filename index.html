@@ -1,110 +1,36 @@
-<!DOCTYPE html>
-<html lang="it" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d0907">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Caffè Tracker Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #0d0907 0%, #1a120b 50%, #0d0907 100%);
-            color: #f5f0e8;
-        }
-        .glass-card {
-            background: linear-gradient(135deg, rgba(45, 30, 20, 0.85) 0%, rgba(25, 18, 12, 0.9) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 165, 116, 0.15);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-        }
-        .btn-gradient {
-            background: linear-gradient(135deg, #d4a574 0%, #8d5a2d 50%, #d4a574 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px -5px rgba(212, 165, 116, 0.5);
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4 pb-12">
+<script>
+    const SUPABASE_URL = 'https://sbqsxhigkmiuoplbdzvc.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Z5_SYnmTBbgElcaRne91Qw_Mb31NzY9';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <header class="w-full max-w-md flex items-center justify-between py-3 px-2 mb-3">
-        <div class="flex items-center space-x-2.5">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-700 via-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/30">
-                <i class="fa-solid fa-mug-hot"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-                    BARISTA <span class="text-xs px-2 py-0.5 rounded-full bg-amber-600/20 text-amber-300 border border-amber-500/40 font-bold uppercase">SaaS</span>
-                </h1>
-                <p class="text-xs text-amber-200/70 font-medium">Gestione Turni • Sincronizzato</p>
-            </div>
-        </div>
-    </header>
-
-    <main class="w-full max-w-md space-y-4">
-        <div class="glass-card rounded-3xl p-6 text-center shadow-xl">
-            <p class="text-xs uppercase tracking-widest font-bold text-amber-200/60 mb-2">Turni Caffè in Tempo Reale</p>
-            
-            <div id="lista-turni" class="space-y-3 mt-4 text-left">
-                <!-- I turni vengono caricati qui dinamicamente -->
-                <p class="text-center text-sm text-amber-200/50">Caricamento turni...</p>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const SUPABASE_URL = 'https://sbqsxhigkmiuoplbdzvc.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_Z5_SYnmTBbgElcaRne91Qw_Mb31NzY9';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function caricaTurni() {
-            const { data, error } = await supabase.from('turni_caffe').select('*').order('id', { ascending: true });
-            const container = document.getElementById('lista-turni');
-            
-            if (error) {
-                container.innerHTML = '<p class="text-red-400 text-center text-sm">Errore di caricamento dati.</p>';
-                return;
+    async function caricaTurniSupabase() {
+        const { data, error } = await supabase.from('turni_caffe').select('*').order('id', { ascending: true });
+        if (error) {
+            console.error('Errore Supabase:', error);
+            return;
+        }
+        if (data && data.length > 0) {
+            // Mappa i dati di Supabase nella struttura della tua app
+            window.turni = data.map(item => ({
+                id: item.id,
+                data: item.data,
+                giorno: item.giorno,
+                chiPaga: item.chi_paga,
+                stato: item.stato
+            }));
+            if (typeof aggiornaInterfaccia === 'function') {
+                aggiornaInterfaccia();
             }
-
-            container.innerHTML = '';
-            data.forEach(row => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3 rounded-xl bg-black/30 border border-amber-500/20';
-                item.innerHTML = `
-                    <div>
-                        <p class="text-xs text-amber-300 font-bold">${row.giorno} (${row.data})</p>
-                        <p class="text-sm font-extrabold text-white">Offre: ${row.chi_paga}</p>
-                    </div>
-                    <button onclick="cambiaStato(${row.id}, '${row.stato}')" class="px-3 py-1.5 rounded-lg text-xs font-bold ${row.stato === 'Pagato' ? 'bg-emerald-600 text-white' : 'bg-amber-600/30 text-amber-300 border border-amber-500/40'}">
-                        ${row.stato}
-                    </button>
-                `;
-                container.appendChild(item);
-            });
         }
+    }
 
-        async function cambiaStato(id, statoAttuale) {
-            const nuovoStato = statoAttuale === 'Pagato' ? 'Da pagare' : 'Pagato';
-            await supabase.from('turni_caffe').update({ stato: nuovoStato }).eq('id', id);
-        }
+    // Sincronizzazione in tempo reale
+    supabase.channel('public:turni_caffe')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'turni_caffe' }, () => {
+            caricaTurniSupabase();
+        })
+        .subscribe();
 
-        // Realtime sync
-        supabase.channel('public:turni_caffe')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'turni_caffe' }, () => {
-                caricaTurni();
-            })
-            .subscribe();
-
-        caricaTurni();
-    </script>
-</body>
-</html>
+    // Caricamento iniziale all'avvio
+    caricaTurniSupabase();
+</script>
