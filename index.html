@@ -1,36 +1,26 @@
 <script>
-    const SUPABASE_URL = 'https://sbqsxhigkmiuoplbdzvc.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_Z5_SYnmTBbgElcaRne91Qw_Mb31NzY9';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL = 'https://sbqsxhigkmiuoplbdzvc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Z5_SYnmTBbgElcaRne91Qw_Mb31NzY9';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function caricaTurniSupabase() {
-        const { data, error } = await supabase.from('turni_caffe').select('*').order('id', { ascending: true });
-        if (error) {
-            console.error('Errore Supabase:', error);
-            return;
-        }
-        if (data && data.length > 0) {
-            // Mappa i dati di Supabase nella struttura della tua app
-            window.turni = data.map(item => ({
-                id: item.id,
-                data: item.data,
-                giorno: item.giorno,
-                chiPaga: item.chi_paga,
-                stato: item.stato
-            }));
-            if (typeof aggiornaInterfaccia === 'function') {
-                aggiornaInterfaccia();
-            }
-        }
+async function caricaDati() {
+    const { data, error } = await supabase.from('turni_caffe').select('*').order('id', { ascending: true });
+    if (error || !data) return;
+
+    const oggi = data[0];
+    if (oggi) {
+        const payerEl = document.getElementById('hero-payer');
+        const dateEl = document.getElementById('current-date-str');
+        if (payerEl) payerEl.innerText = oggi.chi_paga;
+        if (dateEl) dateEl.innerText = oggi.giorno + ' ' + oggi.data;
     }
+}
 
-    // Sincronizzazione in tempo reale
-    supabase.channel('public:turni_caffe')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'turni_caffe' }, () => {
-            caricaTurniSupabase();
-        })
-        .subscribe();
+supabase.channel('public:turni_caffe')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'turni_caffe' }, () => {
+        caricaDati();
+    })
+    .subscribe();
 
-    // Caricamento iniziale all'avvio
-    caricaTurniSupabase();
+caricaDati();
 </script>
